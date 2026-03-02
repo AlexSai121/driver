@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Calendar, BookOpen, Wrench } from 'lucide-react';
+import { Plus, Calendar, Wrench } from 'lucide-react';
 import { motion, useMotionValue, animate, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 import { db } from './firebase';
 import { collection, onSnapshot, addDoc, updateDoc, doc } from 'firebase/firestore';
@@ -24,11 +24,7 @@ type Transaction = {
 };
 
 // Mock Tasks Data
-const initialTasks: Task[] = [
-  { id: 1, title: 'Review pull requests', types: ['Work', 'High Priority'], completed: false, dueDate: 'FEB 27' },
-  { id: 2, title: 'Write project spec', types: ['School'], completed: false, dueDate: 'FEB 27' },
-  { id: 3, title: 'Go to the gym', types: ['Routine'], completed: false, dueDate: 'FEB 26' },
-];
+const initialTasks: Task[] = [];
 
 // Generate all dates for a specific month and year
 const getMonthDates = (year: number, month: number) => {
@@ -107,6 +103,7 @@ function App() {
   const [monthlyBudget, setMonthlyBudget] = useState(1000);
   const [selectedChartMonth, setSelectedChartMonth] = useState(new Date().getMonth());
   const [selectedChartYear, setSelectedChartYear] = useState(new Date().getFullYear());
+  const [mindfulView, setMindfulView] = useState<'PLANNER' | 'JRNL'>('PLANNER');
 
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -128,9 +125,7 @@ function App() {
   const lastVibratedOuter = useRef(0);
 
   const [activeOuterIndex, setActiveOuterIndex] = useState(0);
-  const [activeFinanceViewIndex, setActiveFinanceViewIndex] = useState(0);
-  const modes = ['JOURNAL', 'PLAN', 'TASKS', 'FINANCE', 'TOOLS'];
-  const financeViews = ['Analyzer', 'TRANSACTIONS'];
+  const modes = ['MINDFUL', 'TASKS', 'FINANCE', 'TOOLS'];
   const toolViews = ['POMODORO', 'CALCULATOR', 'RECORDER', 'COMPASS', 'QR GEN', 'CONVERTER'];
   const genericDates = getMonthDates(selectedChartYear, selectedChartMonth);
   // Outer options depend on selectedMode
@@ -420,7 +415,8 @@ function App() {
   // Header Titles
   let currentTitle = selectedMode;
   if (selectedMode === 'TASKS') currentTitle = `${outerOptions[activeOuterIndex]} TASKS`;
-  if (selectedMode === 'FINANCE') currentTitle = financeViews[activeFinanceViewIndex].toUpperCase();
+  if (selectedMode === 'FINANCE') currentTitle = 'FINANCE';
+  if (selectedMode === 'MINDFUL') currentTitle = mindfulView;
   if (selectedMode === 'TOOLS') currentTitle = 'TOOLS';
 
   const handleAddTask = async () => {
@@ -502,12 +498,25 @@ function App() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 20, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    className={`inline-block ${colorClass} ${selectedMode === 'FINANCE' ? 'cursor-pointer active:scale-95' : ''}`}
-                    onClick={() => {
+                    className={`inline-block ${colorClass} ${selectedMode === 'FINANCE' || selectedMode === 'MINDFUL' ? 'cursor-pointer active:scale-95' : ''}`}
+                    onClick={(e) => {
                       if (selectedMode === 'FINANCE') {
                         if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
                         setSelectedTxDate(dateStr);
                         setIsDateTxListOpen(true);
+                      } else if (selectedMode === 'MINDFUL') {
+                        // Handle single vs double click
+                        if (e.detail === 1) {
+                          const timer = setTimeout(() => {
+                            setMindfulView('PLANNER');
+                            setIsPlanOpen(true);
+                          }, 200);
+                          e.currentTarget.dataset.clickTimer = timer.toString();
+                        } else if (e.detail === 2) {
+                          clearTimeout(Number(e.currentTarget.dataset.clickTimer));
+                          setMindfulView('JRNL');
+                          setIsJournalOpen(true);
+                        }
                       }
                     }}
                   >
@@ -630,189 +639,109 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Select View Mechanism */}
-                  <div className="mt-2">
-                    <div className="mb-2 flex items-baseline gap-2">
-                      <span className="font-serif italic text-sm text-secondary capitalize">select</span>
-                      <span className="font-nothing tracking-widest text-sm text-secondary uppercase">finance view</span>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div
-                        className="h-[48px] overflow-y-auto snap-y snap-mandatory scrollbar-hide flex flex-col font-nothing pl-1 w-[65%]"
-                        onScroll={(e) => {
-                          const idx = Math.round(e.currentTarget.scrollTop / 48);
-                          if (idx !== activeFinanceViewIndex) setActiveFinanceViewIndex(idx);
-                        }}
-                      >
-                        {financeViews.map((view) => (
-                          <div key={view} className="relative w-full h-[48px] shrink-0 snap-center pointer-events-none">
+                  {/* Finance View Rendering - simplified to just show bars and transactions */}
+                  <div className="flex flex-col gap-8">
+                    {/* Income / Expense Bars */}
+                    <div className="w-[70%]">
+                      <div className="flex gap-8">
+                        <div className="flex flex-col items-center flex-1">
+                          <span className="font-nothing text-[10px] uppercase tracking-widest mb-2 text-secondary">INCOME</span>
+                          <div className="w-full h-24 border border-[var(--btn-inner-border)] rounded-sm relative overflow-hidden bg-[var(--inset-bg)] shadow-[var(--inset-shadow)]">
                             <motion.div
-                              drag="x"
-                              dragConstraints={{ left: 0, right: 0 }}
-                              dragElastic={0.4}
-                              onDragEnd={(_, info) => {
-                                if (info.offset.x < -60) {
-                                  if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(20);
-                                  if (view === 'TRANSACTIONS') {
-                                    setIsTransactionsModalOpen(true);
-                                  } else {
-                                    // The User requested to remove the "Open Analyzer Page" modal
-                                    // Since we don't need the page itself, the swipe action for Analyzer is removed,
-                                    // BUT the UI elements and graphs are retained above.
-                                  }
-                                }
+                              initial={{ height: 0 }}
+                              animate={{ height: `${incomePct}%` }}
+                              transition={{ type: "spring", stiffness: 60, damping: 15 }}
+                              className="absolute bottom-0 w-full border-t border-[var(--quaternary-color)]"
+                              style={{
+                                background: `repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(78,104,81,0.2) 4px, rgba(78,104,81,0.2) 6px)`
                               }}
-                              className="absolute inset-0 flex items-center px-4 transition-all duration-300 cursor-grab active:cursor-grabbing hover:bg-[var(--inset-bg)] pointer-events-auto matte-glass z-10 shadow-sm rounded-xl"
-                            >
-                              <span className="uppercase text-secondary font-bold tracking-widest text-sm">{view}</span>
-                            </motion.div>
+                            />
+                            <span className="absolute left-2 top-2 text-[10px] font-mono font-bold text-secondary">
+                              ${incomeTotal.toFixed(0)}
+                            </span>
                           </div>
-                        ))}
-                      </div>
+                        </div>
 
-                      <div className="flex flex-col gap-1.5 h-[48px] justify-center ml-2">
-                        {financeViews.map((_, i) => (
-                          <div
-                            key={i}
-                            className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${i === activeFinanceViewIndex ? 'bg-tertiary shadow-[0_0_5px_rgba(184,58,45,0.6)]' : 'bg-gray-600'}`}
-                          />
-                        ))}
+                        <div className="flex flex-col items-center flex-1">
+                          <div className="flex items-center gap-1 mb-2">
+                            {overBudget && (
+                              <div className="w-1.5 h-1.5 led-glow-red rounded-full animate-pulse mr-1"></div>
+                            )}
+                            <span className="font-nothing text-[10px] uppercase tracking-widest text-secondary">Expense</span>
+                          </div>
+                          <div className="w-full h-24 border border-[var(--btn-inner-border)] rounded-sm relative overflow-hidden bg-[var(--inset-bg)] shadow-[var(--inset-shadow)]">
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: `${expensePct}%` }}
+                              transition={{ type: "spring", stiffness: 60, damping: 15 }}
+                              className="absolute bottom-0 w-full border-t border-[var(--tertiary-color)]"
+                              style={{
+                                background: `repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(184,58,45,0.2) 4px, rgba(184,58,45,0.2) 6px)`
+                              }}
+                            />
+                            <span className="absolute left-2 top-2 text-[10px] font-mono font-bold text-secondary">
+                              ${expenseTotal.toFixed(0)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <AnimatePresence mode="wait">
-                    {financeViews[activeFinanceViewIndex] === 'Analyzer' && (
-                      <motion.div
-                        key="analyzer-view"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        className="flex flex-col gap-4"
-                      >
-                        {/* Income / Expense Bars */}
-                        <div className="w-[70%]">
-                          <div className="flex gap-8">
-                            <div className="flex flex-col items-center flex-1">
-                              <span className="font-nothing text-[10px] uppercase tracking-widest mb-2 text-secondary">INCOME</span>
-                              <div className="w-full h-24 border border-[var(--btn-inner-border)] rounded-sm relative overflow-hidden bg-[var(--inset-bg)] shadow-[var(--inset-shadow)]">
-                                <motion.div
-                                  initial={{ height: 0 }}
-                                  animate={{ height: `${incomePct}%` }}
-                                  transition={{ type: "spring", stiffness: 60, damping: 15 }}
-                                  className="absolute bottom-0 w-full border-t border-[var(--quaternary-color)]"
-                                  style={{
-                                    background: `repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(78,104,81,0.2) 4px, rgba(78,104,81,0.2) 6px)`
-                                  }}
-                                />
-                                <span className="absolute left-2 top-2 text-[10px] font-mono font-bold text-secondary">
-                                  ${incomeTotal.toFixed(0)}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col items-center flex-1">
-                              <div className="flex items-center gap-1 mb-2">
-                                {overBudget && (
-                                  <div className="w-1.5 h-1.5 led-glow-red rounded-full animate-pulse mr-1"></div>
-                                )}
-                                <span className="font-nothing text-[10px] uppercase tracking-widest text-secondary">Expense</span>
-                              </div>
-                              <div className="w-full h-24 border border-[var(--btn-inner-border)] rounded-sm relative overflow-hidden bg-[var(--inset-bg)] shadow-[var(--inset-shadow)]">
-                                <motion.div
-                                  initial={{ height: 0 }}
-                                  animate={{ height: `${expensePct}%` }}
-                                  transition={{ type: "spring", stiffness: 60, damping: 15 }}
-                                  className="absolute bottom-0 w-full border-t border-[var(--tertiary-color)]"
-                                  style={{
-                                    background: `repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(184,58,45,0.2) 4px, rgba(184,58,45,0.2) 6px)`
-                                  }}
-                                />
-                                <span className="absolute left-2 top-2 text-[10px] font-mono font-bold text-secondary">
-                                  ${expenseTotal.toFixed(0)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Settings Button */}
-                        <div className="flex flex-col items-start mt-2">
-                          <button
-                            className="flex border border-[var(--inset-border)] items-center px-4 py-2 rounded-full cursor-pointer hover:bg-[var(--inset-bg)] transition-colors text-secondary shadow-[var(--btn-shadow-outer)] active:shadow-[var(--btn-shadow-outer-active)] active:translate-y-[2px]"
-                            onClick={() => {
-                              if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
-                              setIsChartSettingsOpen(true);
-                            }}
-                          >
-                            <span className="text-[10px] uppercase tracking-widest font-mono font-bold">Settings</span>
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {financeViews[activeFinanceViewIndex] === 'TRANSACTIONS' && (
-                      <motion.div
-                        key="transactions-view"
-                        layoutId="transactions-view"
-                        layout
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        className="mt-8 flex flex-col gap-2 relative"
-                      >
-                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-2 mb-2">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest pl-2">
                           {new Date(0, selectedChartMonth).toLocaleString('default', { month: 'long' })} Logs
                         </span>
-                        <AnimatePresence>
-                          {(() => {
-                            const monthTx = transactions.filter(t => {
-                              const d = new Date(t.date);
-                              return d.getMonth() === selectedChartMonth && d.getFullYear() === selectedChartYear;
-                            });
+                        <button
+                          className="flex border border-[var(--inset-border)] items-center px-3 py-1 rounded-full cursor-pointer hover:bg-[var(--inset-bg)] transition-colors text-secondary/60 text-[8px] uppercase tracking-widest font-mono font-bold"
+                          onClick={() => setIsChartSettingsOpen(true)}
+                        >
+                          Settings
+                        </button>
+                      </div>
 
-                            if (monthTx.length === 0) {
-                              return (
-                                <motion.p
-                                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                  className="text-sm text-gray-500 italic mt-4 text-center uppercase tracking-widest font-sans font-bold"
-                                >
-                                  No activity this month.
-                                </motion.p>
-                              );
-                            }
+                      <AnimatePresence>
+                        {(() => {
+                          const monthTx = transactions.filter(t => {
+                            const d = new Date(t.date);
+                            return d.getMonth() === selectedChartMonth && d.getFullYear() === selectedChartYear;
+                          });
 
-                            // Sort by date descending
-                            const sortedTx = [...monthTx].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                          if (monthTx.length === 0) {
+                            return <p className="text-sm text-gray-500 italic mt-4 text-center uppercase tracking-widest font-sans font-bold">No activity.</p>;
+                          }
 
-                            return sortedTx.map(tx => (
-                              <motion.div
-                                layout
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                                key={tx.id}
-                                onClick={() => setSelectedTransaction(tx)}
-                                className="flex items-center justify-between py-3 px-2 border-b border-[var(--inset-border)] cursor-pointer active:scale-95 transition-transform"
-                              >
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-secondary text-base font-plex tracking-wider">{tx.title || tx.category}</span>
-                                  <span className="text-[10px] text-gray-400 uppercase tracking-[0.2em] mt-0.5">
-                                    {new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                  </span>
-                                </div>
-                                <span className={`font-mono text-base font-bold tracking-tighter ${tx.type === 'income' ? 'text-quaternary' : 'text-secondary'}`}>
-                                  {tx.type === 'income' ? '+' : '-'}${Math.abs(tx.amount).toFixed(1)}
+                          const sortedTx = [...monthTx].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+                          return sortedTx.slice(0, 5).map(tx => (
+                            <motion.div
+                              layout
+                              key={tx.id}
+                              onClick={() => setSelectedTransaction(tx)}
+                              className="flex items-center justify-between py-3 px-2 border-b border-[var(--inset-border)] cursor-pointer active:scale-95 transition-transform"
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-bold text-secondary text-sm font-plex tracking-wider">{tx.title || tx.category}</span>
+                                <span className="text-[8px] text-gray-400 uppercase tracking-[0.2em]">
+                                  {new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </span>
-                              </motion.div>
-                            ));
-                          })()}
-                        </AnimatePresence>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                              </div>
+                              <span className={`font-mono text-sm font-bold tracking-tighter ${tx.type === 'income' ? 'text-quaternary' : 'text-secondary'}`}>
+                                {tx.type === 'income' ? '+' : '-'}${Math.abs(tx.amount).toFixed(0)}
+                              </span>
+                            </motion.div>
+                          ));
+                        })()}
+                      </AnimatePresence>
+
+                      <button
+                        onClick={() => setIsTransactionsModalOpen(true)}
+                        className="mt-4 text-[10px] text-secondary/40 font-bold uppercase tracking-widest hover:text-secondary transition-colors"
+                      >
+                        See All &gt;
+                      </button>
+                    </div>
+                  </div>
                 </motion.div>
               );
             })()}
@@ -842,31 +771,108 @@ function App() {
               </motion.div>
             )}
 
-            {selectedMode === 'JOURNAL' && (
+            {selectedMode === 'MINDFUL' && (
               <motion.div
-                key="journal-view"
-                layoutId="main-content-panel"
+                key="mindful-view"
+                layoutId="mindful-view"
                 layout
                 initial={{ opacity: 0, filter: 'blur(4px)' }}
                 animate={{ opacity: 1, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, filter: 'blur(4px)' }}
-                className="text-gray-500 italic mt-10 text-center font-plex"
+                className="font-plex space-y-8 pb-32 pointer-events-auto"
               >
-                Journal functionality coming soon.
-              </motion.div>
-            )}
+                {/* Sub-mode Selection */}
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="flex bg-secondary/5 rounded-full p-1 border border-secondary/10">
+                    {['PLANNER', 'JRNL'].map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => setMindfulView(v as any)}
+                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest transition-all ${mindfulView === v ? 'bg-secondary text-primary' : 'text-gray-500 hover:text-secondary'}`}
+                      >
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            {selectedMode === 'PLAN' && (
-              <motion.div
-                key="plan-view"
-                layoutId="main-content-panel"
-                layout
-                initial={{ opacity: 0, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, filter: 'blur(4px)' }}
-                className="text-gray-500 italic mt-10 text-center font-plex"
-              >
-                Planner functionality coming soon.
+                {/* Folder Stack UI */}
+                <div className="relative h-48 mb-12">
+                  <AnimatePresence mode="popLayout">
+                    <motion.div
+                      key={selectedChartMonth}
+                      initial={{ y: 20, opacity: 0, scale: 0.95 }}
+                      animate={{ y: 0, opacity: 1, scale: 1 }}
+                      exit={{ y: -20, opacity: 0, scale: 0.95 }}
+                      className="absolute inset-0"
+                    >
+                      {/* Paper Layers */}
+                      <div className="absolute inset-0 bg-secondary/5 border border-secondary/10 rounded-lg transform translate-x-2 translate-y-2"></div>
+                      <div className="absolute inset-0 bg-secondary/5 border border-secondary/10 rounded-lg transform translate-x-1 translate-y-1"></div>
+                      <div className="absolute inset-0 bg-[var(--bg-hardware)] border border-secondary/20 rounded-lg p-6 shadow-xl flex flex-col justify-between">
+                        <div className="flex justify-between items-start">
+                          <span className="text-2xl font-bold uppercase tracking-[0.3em] text-secondary">
+                            {new Date(selectedChartYear, selectedChartMonth).toLocaleString('default', { month: 'long' })}
+                          </span>
+                          <span className="text-[10px] uppercase font-mono text-gray-400 font-bold">{selectedChartYear}</span>
+                        </div>
+                        <div className="flex justify-between items-end">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Active Day</span>
+                            <span className="text-lg font-nothing text-secondary">{outerOptions[activeOuterIndex]}</span>
+                          </div>
+                          <div className="w-8 h-8 rounded-full border border-secondary/20 flex items-center justify-center text-xs text-secondary/40">
+                            DOC
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Grid Overview */}
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-gray-500">
+                      # {mindfulView} THIS MONTH
+                    </span>
+                    <div className="w-12 h-[2px] bg-secondary/20 rounded-full"></div>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-x-2 gap-y-3 pt-2">
+                    {genericDates.map((d, i) => {
+                      // Mocking "presence" for now. 
+                      // Red means planner only, Green means journal+planner.
+                      // Logic: let's say odd days have planner, even days have both? Just a demo.
+                      const hasPlanner = i % 3 === 0;
+                      const hasJournal = i % 2 === 0;
+
+                      let dotColor = 'bg-gray-800';
+                      if (hasJournal && hasPlanner) dotColor = 'bg-quaternary shadow-[0_0_8px_rgba(78,104,81,0.6)]';
+                      else if (hasPlanner) dotColor = 'bg-tertiary shadow-[0_0_8px_rgba(184,58,45,0.6)]';
+
+                      return (
+                        <div key={d} className="flex flex-col items-center gap-1">
+                          <div className={`w-2 h-2 rounded-full transition-all duration-300 ${dotColor}`}></div>
+                          {d === outerOptions[activeOuterIndex] && (
+                            <div className="w-4 h-[1px] bg-secondary/30 mt-0.5 animate-pulse"></div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <div className="flex items-center gap-1.5 grayscale opacity-50">
+                      <div className="w-1.5 h-1.5 rounded-full bg-quaternary"></div>
+                      <span className="text-[8px] uppercase font-bold text-gray-400">JRNL + PLAN</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 grayscale opacity-50">
+                      <div className="w-1.5 h-1.5 rounded-full bg-tertiary"></div>
+                      <span className="text-[8px] uppercase font-bold text-gray-400">PLAN ONLY</span>
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -1072,9 +1078,11 @@ function App() {
               setIsAddTaskOpen(true);
             }
             else if (selectedMode === 'FINANCE') setIsAddTransactionOpen(true);
-            else if (selectedMode === 'PLAN') setIsPlanOpen(true);
+            else if (selectedMode === 'MINDFUL') {
+              if (mindfulView === 'PLANNER') setIsPlanOpen(true);
+              else setIsJournalOpen(true);
+            }
             else if (selectedMode === 'TOOLS') setIsToolsOpen(true);
-            else if (selectedMode === 'JOURNAL') setIsJournalOpen(true);
           }}
         >
           <div className="braun-btn-inner text-secondary font-bold tracking-widest text-sm relative overflow-hidden">
@@ -1089,8 +1097,12 @@ function App() {
               >
                 {selectedMode === 'TASKS' && <><Plus className="w-5 h-5 text-tertiary" /> <span className="uppercase">ADD TASK</span></>}
                 {selectedMode === 'FINANCE' && <><Plus className="w-5 h-5 text-quaternary" /> <span className="uppercase">LOG FUNDS</span></>}
-                {selectedMode === 'PLAN' && <><Calendar className="w-5 h-5 text-secondary" /> <span className="uppercase">PLAN</span></>}
-                {selectedMode === 'JOURNAL' && <><BookOpen className="w-5 h-5 text-secondary" /> <span className="uppercase">JOURNAL</span></>}
+                {selectedMode === 'MINDFUL' && (
+                  <>
+                    <Calendar className={`w-5 h-5 ${mindfulView === 'PLANNER' ? 'text-secondary' : 'text-gray-500'}`} />
+                    <span className="uppercase">{mindfulView === 'PLANNER' ? 'PLAN' : 'JOURNAL'}</span>
+                  </>
+                )}
                 {selectedMode === 'TOOLS' && <><Wrench className="w-5 h-5 text-secondary" /> <span className="uppercase">OPEN TOOL</span></>}
               </motion.div>
             </AnimatePresence>
