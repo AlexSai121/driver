@@ -1,0 +1,196 @@
+@font-face {
+  font-family: 'Ndot';
+  src: url('/fonts/Ndot77JPExtended.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-tronica: 'Tronica Mono', 'IBM Plex Mono', monospace;
+  --font-plex: 'IBM Plex Mono', monospace;
+  --font-nothing: 'Ndot', monospace;
+  --color-primary: #121212;
+  --color-secondary: #DCC9A9;
+  --color-tertiary: #B83A2D;
+  --color-quaternary: #4E6851;
+}
+
+@layer base {
+  :root {
+    --bg-hardware: #121212;
+    --grid-line: rgba(255, 255, 255, 0.05);
+
+    --btn-bg: #181818;
+    --btn-shadow-outer: 2px 2px 5px #0a0a0a, -1px -1px 3px rgba(255, 255, 255, 0.03);
+    --btn-shadow-outer-active: inset 2px 2px 5px #0a0a0a, inset -1px -1px 3px rgba(255, 255, 255, 0.02);
+    --btn-inner-bg: #141414;
+    --btn-inner-border: #1f1f1f;
+
+    --panel-grad: linear-gradient(145deg, #181818, #101010);
+    --panel-shadow: 2px 2px 5px #0a0a0a, -2px -2px 5px #1a1a1a, inset 0px 1px 1px rgba(255, 255, 255, 0.05);
+    --panel-border: 1px solid #1f1f1f;
+
+    --inset-bg: #0d0d0d;
+    --inset-shadow: inset 3px 3px 6px #070707, inset -3px -3px 6px #131313;
+    --inset-border: 1px solid rgba(255, 255, 255, 0.03);
+
+    --wheel-bg: rgba(24, 24, 24, 0.6);
+    --wheel-inner-bg: rgba(18, 18, 18, 0.6);
+    --wheel-shadow-outer: inset 2px 2px 10px rgba(0, 0, 0, 0.8);
+    --wheel-shadow-inner: 0 4px 12px rgba(0, 0, 0, 0.9), inset 2px 2px 8px rgba(0, 0, 0, 0.8);
+
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.05);
+  }
+
+  .theme-light {
+    --color-primary: #e4e6e8;
+    --color-secondary: #0a0a0a;
+
+    --bg-hardware: #e4e6e8;
+    --grid-line: rgba(0, 0, 0, 0.05);
+
+    --btn-bg: #e6e8eb;
+    --btn-shadow-outer: 2px 2px 5px #b0b3b8, -1px -1px 3px #ffffff;
+    --btn-shadow-outer-active: inset 2px 2px 5px #b0b3b8, inset -1px -1px 3px #ffffff;
+    --btn-inner-bg: #d8dadf;
+    --btn-inner-border: #b0b3b8;
+
+    --panel-grad: linear-gradient(145deg, #f0f2f5, #cdcfd4);
+    --panel-shadow: 2px 2px 5px #b0b3b8, -2px -2px 5px #ffffff, inset 0px 1px 1px rgba(255, 255, 255, 0.8);
+    --panel-border: 1px solid #b0b3b8;
+
+    --inset-bg: #d0d2d6;
+    --inset-shadow: inset 3px 3px 6px #a0a3a8, inset -2px -2px 4px #ffffff;
+    --inset-border: 1px solid rgba(0, 0, 0, 0.1);
+
+    --wheel-bg: rgba(235, 237, 240, 0.6);
+    --wheel-inner-bg: rgba(225, 227, 230, 0.6);
+    --wheel-shadow-outer: inset 2px 2px 10px rgba(0, 0, 0, 0.15);
+    --wheel-shadow-inner: 0 4px 12px rgba(0, 0, 0, 0.2), inset 2px 2px 8px rgba(0, 0, 0, 0.1);
+
+    --glass-bg: rgba(0, 0, 0, 0.05);
+    --glass-border: rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    @apply bg-primary text-secondary antialiased font-tronica relative overflow-x-hidden;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.03;
+    z-index: 100;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Cassette Futurism Utilities */
+@utility tech-grid-bg {
+  background-image: radial-gradient(var(--grid-line) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+@utility scrollbar-hide {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+@utility scrollbar-small {
+  &::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: 10px;
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-secondary) transparent;
+}
+
+/* Braun Aesthetics / Tactile UI */
+.braun-btn {
+  @apply relative overflow-hidden rounded-[20px] p-[2px] transition-transform duration-200;
+  background: var(--btn-bg);
+  box-shadow: var(--btn-shadow-outer);
+}
+
+.braun-btn:active {
+  box-shadow: var(--btn-shadow-outer-active);
+  transform: translateY(2px) scale(0.98);
+}
+
+.braun-btn-inner {
+  @apply rounded-[18px] w-full h-full flex items-center justify-center;
+  background-color: var(--btn-inner-bg);
+  border: 1px solid var(--btn-inner-border);
+}
+
+.brutalist-container {
+  @apply w-full max-w-[400px] h-[100dvh] mx-auto bg-primary text-secondary relative overflow-hidden tech-grid-bg shadow-2xl;
+}
+
+/* Hardware Aesthetics & Tactile UI (Braun / TE inspired) */
+@utility bg-hardware {
+  /* Matte plastic base with subtle SVG noise texture for physical grain */
+  background-color: var(--bg-hardware);
+  background-image:
+    radial-gradient(var(--grid-line) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 16px 16px, 100px 100px;
+}
+
+@utility matte-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  border: 1px solid var(--glass-border);
+}
+
+@utility hardware-panel {
+  /* Raised physical panel with top-light and under-shadow */
+  background: var(--panel-grad);
+  box-shadow: var(--panel-shadow);
+  border: var(--panel-border);
+}
+
+@utility hardware-inset {
+  /* Sunken/Depressed screen or panel */
+  background: var(--inset-bg);
+  box-shadow: var(--inset-shadow);
+  border-bottom: var(--inset-border);
+}
+
+@utility led-glow-red {
+  background-color: #B83A2D;
+  box-shadow: 0 0 8px rgba(184, 58, 45, 0.6), inset 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+@utility led-glow-green {
+  background-color: #4E6851;
+  box-shadow: 0 0 8px rgba(78, 104, 81, 0.6), inset 0 0 2px rgba(255, 255, 255, 0.5);
+}
