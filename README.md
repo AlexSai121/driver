@@ -1,4 +1,4 @@
-# 🏎️ Daily Driver
+# Daily Driver
 ### The Mechanical Productivity Terminal
 
 **Daily Driver** is a premium, local-first productivity system designed for those who appreciate tactile hardware aesthetics and data privacy. It combines task management, financial logging, calendar tracking, and encrypted notes into a single, high-performance "operating system" interface.
@@ -9,19 +9,19 @@
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🛠️ Hardware-Inspired Interface
+### Hardware-Inspired Interface
 - **Tactile UI**: Built with a "hardware-OS" aesthetic—metallic textures, deep shadows, and neon accents.
 - **Thocky Soundscape**: Every interaction is accompanied by custom high-fidelity mechanical keyboard sounds (Cherry MX Blue/Brown profiles).
 - **Interactive Multi-Wheel**: Navigate dates and categories using a physics-based scroll wheel system.
 
-### 🔐 Privacy & Local-First
+### Privacy & Local-First
 - **Zero Cloud Dependency**: No Firebase, no accounts, and no tracking. Your data is stored 100% locally in your browser's IndexedDB.
 - **Encrypted Notes**: Store your thoughts in a secure environment with encrypted text animations.
 - **PWA Ready**: Install as a native app on Android, iOS, or Desktop for a full standalone experience.
 
-### 📦 All-in-One Modules
+### Modules
 - **Tasks**: Dynamic task scheduling with drag-to-complete interactions.
 - **Finance**: Premium fund logging with transaction receipts and monthly budget analysis.
 - **Calendar**: A streamlined view of your timeline.
@@ -29,7 +29,7 @@
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18 or higher)
@@ -52,7 +52,7 @@
 
 ---
 
-## 📲 How to "Install" on Mobile (PWA)
+## How to "Install" on Mobile (PWA)
 
 1. Open the app URL in your mobile browser.
 2. Tap the **Share** button (iOS) or **Menu** (Android).
@@ -61,7 +61,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 - **Frontend**: React + Vite
 - **Styling**: Tailwind CSS + Framer Motion
 - **Database**: Dexie.js (IndexedDB wrapper)
