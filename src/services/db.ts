@@ -1,31 +1,15 @@
-import { db } from '../firebase';
-import { collection, addDoc, updateDoc, doc, getDocs, query, where, arrayUnion } from 'firebase/firestore';
-
-export type Transaction = {
-      id?: string;
-      title: string;
-      amount: number;
-      type: 'income' | 'expense';
-      category: string;
-      paymentMethod: string;
-      note?: string;
-      date: string;
-};
+import { localDb } from '../db/localDb';
+import type { Transaction } from '../components/FinanceView';
 
 export const addTransaction = async (transaction: Omit<Transaction, 'id'>) => {
-      if (!db) {
-            console.warn("Firebase not configured. Transaction not saved.");
-            return null;
-      }
-
       try {
             // 1. Add the transaction to the transactions collection
-            const docRef = await addDoc(collection(db, 'transactions'), transaction);
+            const id = await localDb.transactions.add(transaction as Transaction);
 
             // 2. Sync to today's journal entry
             await appendTransactionToJournal(transaction);
 
-            return docRef.id;
+            return id;
       } catch (error) {
             console.error("Error adding transaction:", error);
             throw error;
@@ -33,30 +17,23 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id'>) => {
 };
 
 const appendTransactionToJournal = async (transaction: Omit<Transaction, 'id'>) => {
-      if (!db) return;
       const today = new Date().toISOString().split('T')[0];
 
       try {
-            // Check if journal entry exists for today
-            const journalsRef = collection(db, 'journals');
-            const q = query(journalsRef, where("date", "==", today));
-            const querySnapshot = await getDocs(q);
+            const entry = await localDb.journals.where("date").equals(today).first();
+            const summaryText = `${transaction.type === 'expense' ? '-' : '+'}$${transaction.amount} (${transaction.category})${transaction.note ? ' - ' + transaction.note : ''}`;
 
-            const summaryText = `${transaction.type === 'expense' ? '-' : '+'}$${transaction.amount} (${transaction.category}) ${transaction.note ? '- ' + transaction.note : ''}`;
-
-            if (querySnapshot.empty) {
-                  // Create new journal entry for today
-                  await addDoc(journalsRef, {
+            if (!entry) {
+                  await localDb.journals.add({
                         date: today,
-                        financeSummary: [summaryText],
-                        createdAt: new Date().toISOString()
+                        financeSummary: [summaryText]
                   });
             } else {
-                  // Append to existing entry
-                  const journalDocId = querySnapshot.docs[0].id;
-                  await updateDoc(doc(db, 'journals', journalDocId), {
-                        financeSummary: arrayUnion(summaryText)
-                  });
+                  if (entry.id) {
+                        await localDb.journals.update(entry.id, {
+                              financeSummary: [...entry.financeSummary, summaryText]
+                        });
+                  }
             }
       } catch (error) {
             console.error("Error updating journal with transaction:", error);

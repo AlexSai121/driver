@@ -1,0 +1,11 @@
+
+> daily-driver@0.0.0 build
+> tsc -b && vite build
+
+src/App.tsx(758,21): error TS2304: Cannot find name 'setPropertiesExitDir'.
+src/App.tsx(771,21): error TS2304: Cannot find name 'setPropertiesExitDir'.
+src/App.tsx(778,26): error TS2304: Cannot find name 'propertiesExitDir'.
+src/App.tsx(780,22): error TS2304: Cannot find name 'propertiesExitDir'.
+src/App.tsx(787,20): error TS2304: Cannot find name 'propertiesExitDir'.
+src/App.tsx(1624,13): error TS2304: Cannot find name 'setTasks'.
+src/App.tsx(1625,13): error TS2552: Cannot find name 'setTransactions'. Did you mean 'transactions'?

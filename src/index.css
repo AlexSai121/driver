@@ -77,6 +77,134 @@
     --glass-border: rgba(0, 0, 0, 0.1);
   }
 
+  .theme-cyberpunk {
+    --color-primary: #0a0a0c;
+    --color-secondary: #FCEE0A;
+    --color-tertiary: #FF003C;
+    --color-quaternary: #00F0FF;
+
+    --bg-hardware: #0a0a0c;
+    --grid-line: rgba(252, 238, 10, 0.05);
+
+    --btn-bg: #111115;
+    --btn-shadow-outer: 0 0 10px rgba(252, 238, 10, 0.2), inset 0 0 5px rgba(255, 0, 60, 0.1);
+    --btn-shadow-outer-active: 0 0 20px rgba(252, 238, 10, 0.4), inset 0 0 10px rgba(255, 0, 60, 0.2);
+    --btn-inner-bg: #050505;
+    --btn-inner-border: #FCEE0A;
+
+    --panel-grad: linear-gradient(145deg, #111115, #08080a);
+    --panel-shadow: 2px 2px 10px rgba(252, 238, 10, 0.1), -2px -2px 10px rgba(0, 240, 255, 0.05);
+    --panel-border: 1px solid rgba(252, 238, 10, 0.3);
+
+    --inset-bg: #030304;
+    --inset-shadow: inset 2px 2px 15px rgba(0, 0, 0, 0.9);
+    --inset-border: 1px solid rgba(0, 240, 255, 0.2);
+
+    --wheel-bg: rgba(252, 238, 10, 0.05);
+    --wheel-inner-bg: rgba(0, 0, 0, 0.8);
+    --wheel-shadow-outer: 0 0 20px rgba(252, 238, 10, 0.1);
+    --wheel-shadow-inner: inset 0 0 10px rgba(252, 238, 10, 0.2);
+
+    --glass-bg: rgba(252, 238, 10, 0.02);
+    --glass-border: rgba(252, 238, 10, 0.1);
+  }
+
+  .theme-retro {
+    --color-primary: #fffbeb;
+    --color-secondary: #d97706;
+    --color-tertiary: #b91c1c;
+    --color-quaternary: #15803d;
+
+    --bg-hardware: #fef3c7;
+    --grid-line: rgba(217, 119, 6, 0.1);
+
+    --btn-bg: #fde68a;
+    --btn-shadow-outer: 4px 4px 0px #b45309;
+    --btn-shadow-outer-active: 2px 2px 0px #b45309;
+    --btn-inner-bg: #fef3c7;
+    --btn-inner-border: #b45309;
+
+    --panel-grad: linear-gradient(145deg, #fef3c7, #fde68a);
+    --panel-shadow: 8px 8px 0px rgba(180, 83, 9, 0.2);
+    --panel-border: 2px solid #b45309;
+
+    --inset-bg: #fffbeb;
+    --inset-shadow: inset 4px 4px 0px rgba(180, 83, 9, 0.1);
+    --inset-border: 2px solid #b45309;
+
+    --wheel-bg: #fde68a;
+    --wheel-inner-bg: #fef3c7;
+    --wheel-shadow-outer: inset 4px 4px 0px rgba(180, 83, 9, 0.2);
+    --wheel-shadow-inner: 4px 4px 0px rgba(180, 83, 9, 0.2);
+
+    --glass-bg: rgba(254, 243, 199, 0.8);
+    --glass-border: rgba(180, 83, 9, 0.3);
+  }
+
+  .theme-sakura {
+    --color-primary: #fff5f8;
+    --color-secondary: #ff8fab;
+    --color-tertiary: #fb6f92;
+    --color-quaternary: #ffc2d1;
+
+    --bg-hardware: #ffe4e1;
+    --grid-line: rgba(255, 143, 171, 0.1);
+
+    --btn-bg: #ffe4e8;
+    --btn-shadow-outer: 2px 2px 5px #ffb3c6, -1px -1px 3px #ffffff;
+    --btn-shadow-outer-active: inset 2px 2px 5px #ffb3c6, inset -1px -1px 3px #ffffff;
+    --btn-inner-bg: #ffccd5;
+    --btn-inner-border: #ff8fab;
+
+    --panel-grad: linear-gradient(145deg, #ffe4e8, #ffb3c6);
+    --panel-shadow: 2px 2px 5px #ffb3c6, -2px -2px 5px #ffffff;
+    --panel-border: 1px solid #ff8fab;
+
+    --inset-bg: #fff0f3;
+    --inset-shadow: inset 3px 3px 6px #ffb3c6, inset -2px -2px 4px #ffffff;
+    --inset-border: 1px solid rgba(255, 143, 171, 0.2);
+
+    --wheel-bg: rgba(255, 204, 213, 0.6);
+    --wheel-inner-bg: rgba(255, 228, 232, 0.6);
+    --wheel-shadow-outer: inset 2px 2px 10px rgba(255, 143, 171, 0.2);
+    --wheel-shadow-inner: 0 4px 12px rgba(255, 143, 171, 0.2), inset 2px 2px 8px rgba(255, 143, 171, 0.1);
+
+    --glass-bg: rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(255, 143, 171, 0.2);
+  }
+
+  .theme-ocean {
+    --color-primary: #0f172a;
+    --color-secondary: #38bdf8;
+    --color-tertiary: #0ea5e9;
+    --color-quaternary: #7dd3fc;
+
+    --bg-hardware: #0f172a;
+    --grid-line: rgba(56, 189, 248, 0.1);
+
+    --btn-bg: #1e293b;
+    --btn-shadow-outer: 0 0 8px rgba(56, 189, 248, 0.2);
+    --btn-shadow-outer-active: 0 0 15px rgba(56, 189, 248, 0.4);
+    --btn-inner-bg: #0f172a;
+    --btn-inner-border: #38bdf8;
+
+    --panel-grad: linear-gradient(145deg, #1e293b, #0f172a);
+    --panel-shadow: 2px 2px 10px rgba(56, 189, 248, 0.15);
+    --panel-border: 1px solid rgba(56, 189, 248, 0.3);
+
+    --inset-bg: #020617;
+    --inset-shadow: inset 2px 2px 10px rgba(0, 0, 0, 0.8);
+    --inset-border: 1px solid rgba(56, 189, 248, 0.2);
+
+    --wheel-bg: rgba(56, 189, 248, 0.05);
+    --wheel-inner-bg: rgba(15, 23, 42, 0.8);
+    --wheel-shadow-outer: inset 0 0 15px rgba(56, 189, 248, 0.1);
+    --wheel-shadow-inner: 0 4px 12px rgba(0, 0, 0, 0.5), inset 2px 2px 8px rgba(56, 189, 248, 0.2);
+
+    --glass-bg: rgba(56, 189, 248, 0.05);
+    --glass-border: rgba(56, 189, 248, 0.2);
+  }
+
   body {
     @apply bg-primary text-secondary antialiased font-tronica relative overflow-x-hidden;
   }
@@ -193,4 +321,89 @@
 @utility led-glow-green {
   background-color: #4E6851;
   box-shadow: 0 0 8px rgba(78, 104, 81, 0.6), inset 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* ═══ Dot-Matrix Receipt Styles ═══ */
+.receipt-paper {
+  background-color: #f5f0e8;
+  border-radius: 4px 4px 0 0;
+  box-shadow:
+    0 2px 20px rgba(0, 0, 0, 0.3),
+    inset 0 0 30px rgba(0, 0, 0, 0.03);
+  position: relative;
+}
+
+.receipt-text {
+  font-family: 'Courier New', 'Courier', monospace;
+  font-size: 10px;
+  color: #2a2a2a;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.receipt-edge {
+  height: 16px;
+  background-color: #f5f0e8;
+  clip-path: polygon(0% 0%, 4% 100%, 8% 0%, 12% 100%, 16% 0%, 20% 100%,
+      24% 0%, 28% 100%, 32% 0%, 36% 100%, 40% 0%, 44% 100%,
+      48% 0%, 52% 100%, 56% 0%, 60% 100%, 64% 0%, 68% 100%,
+      72% 0%, 76% 100%, 80% 0%, 84% 100%, 88% 0%, 92% 100%,
+      96% 0%, 100% 100%);
+}
+
+.printer-slot {
+  height: 6px;
+  background: linear-gradient(to bottom, #1a1a1a, #2d2d2d);
+  border-radius: 3px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Performance: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Design: Accessible focus-visible styles */
+@layer base {
+  *:focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+    border-radius: 4px;
+    box-shadow: 0 0 0 4px rgba(220, 201, 169, 0.15);
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+    box-shadow: 0 0 12px rgba(220, 201, 169, 0.2);
+  }
+
+  .theme-light *:focus-visible {
+    outline-color: var(--color-secondary);
+    box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1);
+  }
+
+  .theme-light button:focus-visible,
+  .theme-light a:focus-visible,
+  .theme-light input:focus-visible,
+  .theme-light textarea:focus-visible,
+  .theme-light select:focus-visible {
+    box-shadow: 0 0 12px rgba(10, 10, 10, 0.15);
+  }
 }
