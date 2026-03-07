@@ -33,8 +33,13 @@ jobs:
       - name: Build Web Project
         run: npm run build
 
+      - name: Debug Info
+        run: |
+          ls -R
+          npx cap --version
+
       - name: Capacitor Sync
-        run: npx cap sync android
+        run: npx cap sync android --verbose
 
       - name: Build Android APK
         run: |
